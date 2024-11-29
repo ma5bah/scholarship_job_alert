@@ -1,0 +1,6 @@
+{
+  "watch": ["src"],
+  "ext": "ts",
+  "ignore": ["dist", "node_modules"],
+  "exec": "swc ./src -d dist && node --env-file=.env dist/src/main.js"
+}

@@ -1,0 +1,26 @@
+{
+    "jsc": {
+        "parser": {
+            "syntax": "typescript",
+            "tsx": true,
+            "preserveAllComments": false
+        },
+        "transform": null,
+        "target": "es2022",
+        "loose": false,
+        "externalHelpers": false,
+        // Requires v1.2.50 or upper and requires target to be es2016 or upper.
+        "keepClassNames": false
+    },
+    "isModule": true,
+    // Enable minification
+    // "minify": true,
+    "module": {
+        "type": "commonjs",
+        // These are defaults.
+        "strict": false,
+        "strictMode": true,
+        "lazy": false,
+        "noInterop": false
+    }
+}
