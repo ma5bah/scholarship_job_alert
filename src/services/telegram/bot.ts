@@ -5,7 +5,7 @@ import {MyContext} from "./models/context.model";
 
 
 dotenv.config();
-const bot_secret_token = process.env.VC_BOT_TOKEN!;
+const bot_secret_token = process.env.SCHOLARSHIP_BOT_TOKEN!;
 const bot = new Telegraf<MyContext>(bot_secret_token);
 console.log('Bot token:', bot_secret_token);
 

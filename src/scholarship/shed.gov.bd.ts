@@ -1,4 +1,8 @@
-const url = "https://shed.gov.bd/site/view/scholarship/%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%AC%E0%A7%83%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF-%E0%A6%AC%E0%A6%BF%E0%A6%9C%E0%A7%8D%E0%A6%9E%E0%A6%AA%E0%A7%8D%E0%A6%A4%E0%A6%BF"
+import axios from "axios";
+import * as dom from "jsdom"
+import https from "https";
+import {createHash} from "crypto";
+import {ScholarshipService} from "../services/abstract";
 
 const headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
@@ -22,8 +26,8 @@ const headers = {
     'sec-ch-ua-platform': '"macOS"',
 };
 
-import * as dom from "jsdom"
-interface IShedScholarship {
+export interface IShedScholarship {
+    hashed_id: string;
     id: string;
     name: string;
     date_of_creation: string;
@@ -35,46 +39,61 @@ const parse_link = (text_data: string) => {
     const link = text_data.match(/href="([^"]*)/)
     return link[1];
 }
-const parse_html = async (html: string) => {
-    const html_dom = new dom.JSDOM(html)
-    const table = html_dom.window.document.querySelector('table.bordered')
-    const rows = table.getElementsByTagName("tr")
-    let count = 0
-    let ret_data: IShedScholarship[] = []
-    for (const row of rows) {
-        if (count == 0) {
-            count++;
-            continue;
-        }
-        const columns = row.getElementsByTagName("td");
-        const data: IShedScholarship = {
-            id: columns[0].textContent,
-            name: columns[1].textContent.trim(),
-            date_of_creation: columns[2].textContent,
-            file: parse_link(columns[3].innerHTML),
-            online_application_link: parse_link(columns[4].innerHTML),
-        }
-        ret_data.push(data);
-        console.log(data);
-        count++;
-    }
-    return ret_data;
-}
 
-export const shed_gov_bd = async () => {
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-            // headers: headers,
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+export class ShedScholarshipService extends ScholarshipService<IShedScholarship> {
+    public name: string = 'Shed Scholarship';
+    public url = "https://shed.gov.bd/site/view/scholarship/%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%AC%E0%A7%83%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF-%E0%A6%AC%E0%A6%BF%E0%A6%9C%E0%A7%8D%E0%A6%9E%E0%A6%AA%E0%A7%8D%E0%A6%A4%E0%A6%BF";
+    public async requestNewData(): Promise<IShedScholarship[]> {
+        let data = await this._request_new_data()
+        const ret_data = this.updateLatestData(data);
+        return ret_data;
+    }
+
+
+    protected parse_html(html: string){
+        const html_dom = new dom.JSDOM(html)
+        const table = html_dom.window.document.querySelector('table.bordered')
+        const rows = table.getElementsByTagName("tr")
+        let count = 0
+        let ret_data: IShedScholarship[] = []
+        for (const row of rows) {
+            if (count == 0) {
+                count++;
+                continue;
+            }
+            const columns = row.getElementsByTagName("td");
+            let file_link = parse_link(columns[3].innerHTML);
+            file_link = file_link.split(`//shed.gov.bd`)[1]
+            file_link = `https://shed.gov.bd${file_link}`
+            const data: IShedScholarship = {
+                hashed_id: createHash('sha256').update(file_link).digest('hex'),
+                id: columns[0].textContent,
+                name: columns[1].textContent.trim(),
+                date_of_creation: columns[2].textContent,
+                file: file_link,
+                online_application_link: parse_link(columns[4].innerHTML),
+            }
+            ret_data.push(data);
+            // console.log(data);
+            count++;
         }
-        const data = await response.text();
-        const parsed_html = await parse_html(data);
-        return parsed_html;
+        return ret_data;
     }
-    catch (error) {
-        console.error('Error:', error);
-    }
-};
+    protected async _request_new_data(): Promise<IShedScholarship[]> {
+        try {
+            const response = await axios.get(url, {
+                headers: headers,
+                httpsAgent: new https.Agent({rejectUnauthorized: false})
+            });
+            if (response.status !== 200) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = response.data;
+            const parsed_html = this.parse_html(data);
+            return parsed_html;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+}
