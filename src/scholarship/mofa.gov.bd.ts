@@ -2,7 +2,8 @@ import axios from 'axios';
 import https from 'https';
 import {createHash} from 'crypto';
 import * as dom from "jsdom"
-import {ScholarshipService} from "../services/abstract";
+import {IScholarship, ScholarshipService} from "../models/abstract";
+import {FirebaseAdminService} from "../services/firebase/firebase_admin/firebase_admin.service";
 
 const options = {
     headers: {
@@ -27,11 +28,8 @@ const options = {
         'sec-ch-ua-platform': '"macOS"',
     },
 };
-export interface IMofaScholarship {
-    hashed_id: string;
-    name: string;
-    date_of_creation: string;
-    file: string;
+
+export interface IMofaScholarship extends IScholarship {
 }
 
 const parse_link = (text_data: string) => {
@@ -40,17 +38,28 @@ const parse_link = (text_data: string) => {
 }
 
 export default class MofaScholarshipService extends ScholarshipService<IMofaScholarship> {
-    public name: string = "Mofa Scholarship";
-    public url = 'https://mofa.gov.bd/site/page/4d3e5b27-0827-435f-b31f-47917510962b/Scholarships';
+
+    constructor(firebaseService: FirebaseAdminService) {
+        super(firebaseService); // Only allowed here
+    }
+
+    get_url(): string {
+        return 'https://mofa.gov.bd/site/page/4d3e5b27-0827-435f-b31f-47917510962b/Scholarships';
+    }
+
+    get_name(): string {
+        return "MofaScholarship";
+    }
+
     public async requestNewData(): Promise<IMofaScholarship[]> {
-        let data =  await this._request_new_data();
+        let data = await this._request_new_data();
         const ret_data = this.updateLatestData(data);
         return ret_data;
     }
 
-    protected async _request_new_data(): Promise<IMofaScholarship[]>  {
+    protected async _request_new_data(): Promise<IMofaScholarship[]> {
         try {
-            const response = await axios.get(url, {
+            const response = await axios.get(this.get_url(), {
                 headers: options.headers,
                 httpsAgent: new https.Agent({rejectUnauthorized: false})
             });
@@ -60,12 +69,12 @@ export default class MofaScholarshipService extends ScholarshipService<IMofaScho
             const data = response.data;
             const parsed_html = this.parse_html(data);
             return parsed_html;
-        }
-        catch (error) {
+        } catch (error) {
             console.error('Error:', error);
         }
     };
-    protected parse_html(data: string): IMofaScholarship[]  {
+
+    protected parse_html(data: string): IMofaScholarship[] {
         const html_dom = new dom.JSDOM(data)
         // table tag with attribute border
         const table = html_dom.window.document.querySelector('table[border]')
@@ -78,13 +87,14 @@ export default class MofaScholarshipService extends ScholarshipService<IMofaScho
                 continue;
             }
             const columns = row.getElementsByTagName("td");
-            let file_link=parse_link(columns[0].innerHTML);
+            let file_link = parse_link(columns[0].innerHTML);
 
             const data: IMofaScholarship = {
                 hashed_id: createHash('sha256').update(file_link).digest('hex'),
-                name:columns[0].textContent.trim(),
+                name: columns[0].textContent.trim(),
                 date_of_creation: columns[1].textContent.trim(),
-                file: file_link
+                file: URL.parse(file_link).href
+
             }
             ret_data.push(data);
             // console.log(data);

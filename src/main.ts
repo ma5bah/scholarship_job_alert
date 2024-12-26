@@ -23,10 +23,11 @@
 import MofaScholarshipService from "./scholarship/mofa.gov.bd";
 import {ShedScholarshipService} from "./scholarship/shed.gov.bd";
 import {send_message_to_chat} from "./services/telegram/bot";
-
+import {FirebaseAdminService} from "./services/firebase/firebase_admin/firebase_admin.service";
+const firebase_service=new FirebaseAdminService();
 const services = [
-    new MofaScholarshipService(),
-    new ShedScholarshipService(),
+    new MofaScholarshipService(firebase_service),
+    new ShedScholarshipService(firebase_service),
 ]
 
 const main = async () => {
@@ -34,7 +35,7 @@ const main = async () => {
         try {
             const new_data = await service.requestNewData();
             for (const data of new_data) {
-                const messageContent = `New Scholarship is Available in ${service.name}! Please check the link: ${service.url}`;
+                const messageContent = `New Scholarship is Available in ${service.get_name()}! Please check the link: ${service.get_url()}`;
                 const {ok, message} = await send_message_to_chat("@scholarship_machine", messageContent);
 
                 if (!ok) {

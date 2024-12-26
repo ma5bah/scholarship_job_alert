@@ -1,5 +1,5 @@
 .idea
-
+src/services/firebase/firebase_admin/firebase_config.ts
 
 
 # Logs
