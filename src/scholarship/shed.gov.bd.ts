@@ -78,7 +78,7 @@ export class ShedScholarshipService extends ScholarshipService<IShedScholarship>
                 id: columns[0].textContent,
                 name: columns[1].textContent.trim(),
                 date_of_creation: columns[2].textContent,
-                file: URL.parse(file_link).href,
+                file: (new URL(file_link)).href.toString(),//URL.parse(file_link).href,
                 online_application_link: parse_link(columns[4].innerHTML),
             }
             ret_data.push(data);

@@ -26,12 +26,16 @@ const main = async () => {
 
             if (new_data.length > 0) {
                 const messageContent = `🚀 Exciting News! A new scholarship opportunity is now available on ${service.get_name()}! 🌟 \n\nDon't miss out—check it out here: ${service.get_url()} 🎓\n\n📩 Got feedback or questions? Reach out to @ma5bah — we'd love to hear from you! 📨`;
-
-                if (process.env.NODE_ENV === "development") {
-
+                if(!is_production()){
+                    const {
+                        ok,
+                        message
+                    } = await send_message_to_chat(process.env.TEST_CHAT_ID, messageContent);
+                    if (!ok) {
+                        console.error(`Error sending message for ${service.constructor.name}:`, message);
+                    }
+                    break;
                 }
-
-
                 const {
                     ok: ok_1,
                     message: message_1
@@ -50,7 +54,6 @@ const main = async () => {
                 }
                 // Wait for 1 second before sending the next message
                 await new Promise((resolve) => setTimeout(resolve, 1000));
-                break;
             }
 
         } catch (error) {

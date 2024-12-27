@@ -5,11 +5,12 @@ if [ ! -d "node_modules" ]; then
   pnpm install;
 fi
 pnpm run build;
-tar -czvf dist.tar.gz dist/ production.config.js package.json .env;
+tar -czvf dist.tar.gz dist/ production.config.js package.json;
 
-scp dist.tar.gz vector_vm:~/scholarship_machine/
+scp .env ma5bah_vm:~/scholarship_machine/;
+scp dist.tar.gz ma5bah_vm:~/scholarship_machine/;
 
-ssh vector_vm << EOF
+ssh ma5bah_vm << EOF
   export PNPM_HOME="$HOME/.local/share/pnpm"
   export PATH="$PNPM_HOME/bin:$PATH"
 

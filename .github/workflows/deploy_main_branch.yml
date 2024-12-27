@@ -21,19 +21,14 @@ jobs:
           npm install -g pnpm
       - name : Install Dependencies
         run: |
-          pnpm install
-      - name: Copy Production Environment
-        run: |
-          cp .production.env .env
-      - name: Build Project
-        run: |
-          node build.js;
+          pnpm install;
+          pnpm run build;
       - name: Install Necessary Packages
         run: |
           sudo apt install tar -y
       - name: Compressing necessary files
         run: |
-          tar -czvf dist.tar.gz output.js production.config.js;
+          tar -czvf dist.tar.gz dist/ production.config.js package.json;
       - name: Configure SSH
         run: |
             mkdir -p ~/.ssh/
@@ -52,37 +47,33 @@ jobs:
             SSH_HOST: ${{ secrets.PRODUCTION_SSH_HOST }}
       - name: Copy dist.tar.gz to production server
         run: |
-          scp dist.tar.gz production_server:~/vector_classes_management_system/ && rm dist.tar.gz;
+          scp dist.tar.gz production_server:~/scholarship_machine/ && rm dist.tar.gz;
       - name: Install necessary packages on production server
         run: |
           ssh production_server << EOF
-            sudo apt install tar lsof postgresql-client -y;
             sudo npm install -g pm2 pnpm;
+            export PNPM_HOME="$HOME/.local/share/pnpm";
+            export PATH="$PNPM_HOME/bin:$PATH";
           EOF
       - name: Clear dist folder on production server
         run: |
           ssh production_server << EOF
-          cd ~/vector_classes_management_system;
+          cd ~/scholarship_machine;
           rm -rf dist;
-          EOF
-      - name: Extract dist.tar.gz on production server
-        run: |
-          ssh production_server << EOF
-          cd ~/vector_classes_management_system;
           tar -xzvf dist.tar.gz;
           rm dist.tar.gz;
           EOF
       - name: Install necessary nodejs packages on production server
         run: |
           ssh production_server << EOF
-          cd ~/vector_classes_management_system;
-          cp ~/.local/share/pnpm/global/*/node_modules/@prisma/engines/libquery_engine* .;
+          cd ~/scholarship_machine;
+          pnpm install;
           EOF
       - name: Restarting PM2 on production server
         run: |
           ssh production_server << EOF
-          cd ~/vector_classes_management_system;
-          pm2 restart production.config.js;
+          cd ~/scholarship_machine;
+          ~/.local/share/pnpm/pm2 restart production.config.js;
           EOF
 
 

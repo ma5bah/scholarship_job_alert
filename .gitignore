@@ -1,6 +1,7 @@
 .idea
 src/services/firebase/firebase_admin/firebase_config.ts
-
+dist.tar.gz
+islamestic.i_am_feeling.ts
 
 # Logs
 logs

@@ -1,0 +1,1 @@
+scp .env vector_vm:~/scholarship_machine/;

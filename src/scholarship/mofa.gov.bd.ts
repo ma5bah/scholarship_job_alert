@@ -93,7 +93,7 @@ export default class MofaScholarshipService extends ScholarshipService<IMofaScho
                 hashed_id: createHash('sha256').update(file_link).digest('hex'),
                 name: columns[0].textContent.trim(),
                 date_of_creation: columns[1].textContent.trim(),
-                file: URL.parse(file_link).href
+                file: (new URL(file_link)).href.toString() //URL.parse(file_link).href
 
             }
             ret_data.push(data);
