@@ -4,9 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "node build.js",
-    "start": "pnpm run build && node output.js",
-    "bun_build": "bun build src/bot.ts --compile --minify --sourcemap --outfile=telegram_bot",
+    "build": "swc ./src -d dist",
+    "start": "swc ./src -d dist && node dist/src/main.js",
     "dev": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

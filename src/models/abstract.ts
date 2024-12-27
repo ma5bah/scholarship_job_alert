@@ -1,5 +1,4 @@
 import {FirebaseAdminService} from "../services/firebase/firebase_admin/firebase_admin.service";
-import * as console from "node:console";
 
 interface HashedEntity {
     hashed_id: string;
@@ -43,9 +42,9 @@ export abstract class ScholarshipService<T extends HashedEntity> {
         // console.log("set",this.hashedIdSet,newData)
         for (const data of newData) {
             if (this.isNewData(data)) {
-                if(await this.firebase_service.is_doc_exist(this,data)){
-                    continue
-                }
+                // if(await this.firebase_service.is_doc_exist(this,data)){
+                //     continue
+                // }
                 await this.firebase_service.write_doc(this, data);
                 this.storage.push(data);
                 this.hashedIdSet.add(data.hashed_id);

@@ -3,7 +3,6 @@ import {Firestore, getFirestore} from "firebase-admin/firestore"
 import {credential} from "firebase-admin";
 import * as process from "node:process";
 import {ScholarshipService} from "../../../models/abstract";
-import * as console from "node:console";
 
 export class FirebaseAdminService {
     private readonly app: App;
