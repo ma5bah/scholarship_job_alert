@@ -1,7 +1,7 @@
 module.exports = {
     apps: [{
         name: 'scholarship_machine',
-        script: 'pnpm run start;',
+        script: 'node dist/src/main.js',
         env: {
             "NODE_ENV": "production",
             "CRON_TIME": "*/10 * * * *",

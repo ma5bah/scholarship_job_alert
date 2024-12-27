@@ -5,7 +5,7 @@ if [ ! -d "node_modules" ]; then
   pnpm install;
 fi
 pnpm run build;
-tar -czvf dist.tar.gz dist/ production.config.js package.json;
+tar -czvf dist.tar.gz dist/ production.config.js package.json .env;
 
 scp dist.tar.gz vector_vm:~/scholarship_machine/
 

@@ -11,6 +11,11 @@ const services = [
     new MofaScholarshipService(firebase_service),
     new ShedScholarshipService(firebase_service),
 ]
+
+const is_production = () => {
+    return process.env.NODE_ENV === "production";
+}
+
 let count = 0;
 const main = async () => {
     count++;
@@ -21,6 +26,11 @@ const main = async () => {
 
             if (new_data.length > 0) {
                 const messageContent = `🚀 Exciting News! A new scholarship opportunity is now available on ${service.get_name()}! 🌟 \n\nDon't miss out—check it out here: ${service.get_url()} 🎓\n\n📩 Got feedback or questions? Reach out to @ma5bah — we'd love to hear from you! 📨`;
+
+                if (process.env.NODE_ENV === "development") {
+
+                }
+
 
                 const {
                     ok: ok_1,

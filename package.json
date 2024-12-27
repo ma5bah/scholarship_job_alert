@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "swc ./src -d dist",
-    "start": "swc ./src -d dist && node dist/src/main.js",
+    "start": "node dist/src/main.js",
     "dev": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
