@@ -1,1 +1,1 @@
-scp .env vector_vm:~/scholarship_machine/;
+scp .env ma5bah_vm:~/scholarship_machine/;
