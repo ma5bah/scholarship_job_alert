@@ -6,15 +6,15 @@ To setup the project, follow the instructions below:
 
 1. Clone the repository by running the command below:
 ```bash
-  git clone
+  git clone https://github.com/ma5bah/scholarship_job_alert.git;
 ```
 2. Change into the project directory by running the command below:
 ```bash
-  cd scholarship_job_alerts
+  cd scholarship_job_alert;
 ```
 3. Install the required packages by running the command below:
 ```bash
-  pnpm install
+  pnpm install;
 ```
 4. Start the project by running the command below:
 ```bash
